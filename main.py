@@ -21,3 +21,7 @@ test_data, test_labels = load_data('/content/drive/MyDrive/Copy of test_data_SYN
 
 print(test_data.shape)
 print(np.unique(test_labels, return_counts=True)) 
+
+model0 = SVC(C = 2.2 , gamma = 'scale' , kernel = 'rbf' , verbose = 1)
+model0.fit(train_data , train_labels)
+accuracy_score(test_labels , model0.predict(test_data)) , accuracy_score(train_labels , model0.predict(train_data))
