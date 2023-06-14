@@ -29,40 +29,40 @@ accuracy_score(test_labels , model0.predict(test_data)) , accuracy_score(train_l
 # neural network which is responsible for feature selection --> outputs feature numbers with the most impact on model
 
 def training(train_data, train_labels,test_data, test_labels , variance):
-  input_tensor = tf.keras.Input(shape=(1024,))
-  tf.random.set_seed(1234)
-  hidden_size = 2048
-  reg_l1_param = 1e-4
+    input_tensor = tf.keras.Input(shape=(1024,))
+    tf.random.set_seed(1234)
+    hidden_size = 2048
+    reg_l1_param = 1e-4
 
-  hidden_layer_1 = tf.keras.layers.Dense(units=hidden_size, activation=tf.nn.relu, 
-                                        name = 'hidden_layer',
-                                        activity_regularizer=tf.keras.regularizers.l1(reg_l1_param))(input_tensor)
+    hidden_layer_1 = tf.keras.layers.Dense(units=hidden_size, activation=tf.nn.relu, 
+                                            name = 'hidden_layer',
+                                            activity_regularizer=tf.keras.regularizers.l1(reg_l1_param))(input_tensor)
 
-  output_layer = tf.keras.layers.Dense(units=10, activation=tf.nn.softmax, name = 'classification_layer')(hidden_layer_1)
+    output_layer = tf.keras.layers.Dense(units=10, activation=tf.nn.softmax, name = 'classification_layer')(hidden_layer_1)
 
-  model = tf.keras.Model(inputs=input_tensor, outputs=output_layer)
-  model.compile(optimizer = 'adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model = tf.keras.Model(inputs=input_tensor, outputs=output_layer)
+    model.compile(optimizer = 'adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-  history = model.fit(train_data, train_labels, epochs=10, batch_size=32 , validation_data=(test_data, test_labels))
-  test_loss, test_acc = model.evaluate(test_data, test_labels)
-  arg_max1 = np.argmax(np.mean(abs(model.get_layer('classification_layer').get_weights()[0]) , axis = 1))
-  thresh = np.mean(abs(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1])) + variance
-  lg2_arg = np.argwhere(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1] > thresh)
-  return lg2_arg
+    history = model.fit(train_data, train_labels, epochs=10, batch_size=32 , validation_data=(test_data, test_labels))
+    test_loss, test_acc = model.evaluate(test_data, test_labels)
+    arg_max1 = np.argmax(np.mean(abs(model.get_layer('classification_layer').get_weights()[0]) , axis = 1))
+    thresh = np.mean(abs(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1])) + variance
+    lg2_arg = np.argwhere(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1] > thresh)
+    return lg2_arg
 
 # select the best common features among different iterations --> returns the intersection of all best features
 
 def return_common_elements(times = 1 , variance = - 0.05):
-  res = []
-  for i in range(times):
-    x = training(train_data, train_labels,test_data, test_labels , variance)
-    if i > 0:
-      temp = res[0]
-      res.pop()
-      res.append(np.intersect1d(temp , x))
-    else:
-      res.append(x)
-  return res[0]
+    res = []
+    for i in range(times):
+        x = training(train_data, train_labels,test_data, test_labels , variance)
+        if i > 0:
+        temp = res[0]
+        res.pop()
+        res.append(np.intersect1d(temp , x))
+        else:
+        res.append(x)
+    return res[0]
 
 x = return_common_elements(times = 4 , variance = -0.04)
 print(x.shape)
