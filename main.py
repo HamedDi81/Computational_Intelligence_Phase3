@@ -4,6 +4,7 @@ import numpy as np
 from typing import Tuple
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
 
 # Load the data and label
 def load_data(filename: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -24,7 +25,8 @@ print(np.unique(test_labels, return_counts=True))
 
 model0 = SVC(C = 2.2 , gamma = 'scale' , kernel = 'rbf' , verbose = 1)
 model0.fit(train_data , train_labels)
-accuracy_score(test_labels , model0.predict(test_data)) , accuracy_score(train_labels , model0.predict(train_data))
+print(accuracy_score(test_labels , model0.predict(test_data)) , accuracy_score(train_labels , model0.predict(train_data)))
+print("\n",confusion_matrix(test_labels, model0.predict(test_data)))
 
 # neural network which is responsible for feature selection --> outputs feature numbers with the most impact on model
 
@@ -57,11 +59,11 @@ def return_common_elements(times = 1 , variance = - 0.05):
     for i in range(times):
         x = training(train_data, train_labels,test_data, test_labels , variance)
         if i > 0:
-        temp = res[0]
-        res.pop()
-        res.append(np.intersect1d(temp , x))
+            temp = res[0]
+            res.pop()
+            res.append(np.intersect1d(temp , x))
         else:
-        res.append(x)
+            res.append(x)
     return res[0]
 
 x = return_common_elements(times = 4 , variance = -0.04)
