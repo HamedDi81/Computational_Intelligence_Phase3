@@ -30,13 +30,12 @@ print("\n",confusion_matrix(test_labels, model0.predict(test_data)))
 
 # neural network which is responsible for feature selection --> outputs feature numbers with the most impact on model
 
-def training(train_data, train_labels,test_data, test_labels , variance):
-    input_tensor = tf.keras.Input(shape=(1024,))
-    tf.random.set_seed(1234)
+def training(train_data, train_labels,test_data, test_labels ,index):
+    input_tensor = tf.keras.Input(shape=(index.shape[0],))
     hidden_size = 2048
-    reg_l1_param = 1e-4
+    reg_l1_param = 1.05e-4
 
-    hidden_layer_1 = tf.keras.layers.Dense(units=hidden_size, activation=tf.nn.relu, 
+    hidden_layer_1 = tf.keras.layers.Dense(units=hidden_size, activation=tf.nn.relu,
                                             name = 'hidden_layer',
                                             activity_regularizer=tf.keras.regularizers.l1(reg_l1_param))(input_tensor)
 
@@ -47,24 +46,18 @@ def training(train_data, train_labels,test_data, test_labels , variance):
 
     history = model.fit(train_data, train_labels, epochs=10, batch_size=32 , validation_data=(test_data, test_labels))
     test_loss, test_acc = model.evaluate(test_data, test_labels)
-    arg_max1 = np.argmax(np.mean(abs(model.get_layer('classification_layer').get_weights()[0]) , axis = 1))
-    thresh = np.mean(abs(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1])) + variance
-    lg2_arg = np.argwhere(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1] > thresh)
-    return lg2_arg
+    arg_max1 = np.argmax(np.mean(model.get_layer('classification_layer').get_weights()[0] , axis = 1))
+    x = np.sort(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1])[::-1]
+    captured = index[np.squeeze(np.array([np.argwhere(model.get_layer("hidden_layer").get_weights()[0][:,arg_max1] == i) for i in x[:25]]))]
 
-# select the best common features among different iterations --> returns the intersection of all best features
+    return captured
 
-def return_common_elements(times = 1 , variance = - 0.05):
-    res = []
-    for i in range(times):
-        x = training(train_data, train_labels,test_data, test_labels , variance)
-        if i > 0:
-            temp = res[0]
-            res.pop()
-            res.append(np.intersect1d(temp , x))
-        else:
-            res.append(x)
-    return res[0]
 
-x = return_common_elements(times = 4 , variance = -0.04)
-print(x.shape)
+index = np.arange(1024)
+g_features = list()
+captured = list()
+for i in range(10):
+    index = np.setdiff1d(index , captured)
+    captured = training(train_data[:,index], train_labels ,test_data[:,index], test_labels , index)
+    g_features.extend(captured)
+
