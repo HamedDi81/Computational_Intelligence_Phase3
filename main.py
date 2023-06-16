@@ -52,6 +52,7 @@ def training(train_data, train_labels,test_data, test_labels ,index):
 
     return captured
 
+# choose the best 25 features on each try
 
 index = np.arange(1024)
 g_features = list()
@@ -61,3 +62,13 @@ for i in range(10):
     captured = training(train_data[:,index], train_labels ,test_data[:,index], test_labels , index)
     g_features.extend(captured)
 
+# train model with obtained features
+
+x = 25
+print("Score" , "    Accuracy","    Features" , "\n")
+for i in range(10):
+  model3 = SVC(C = 2.2, gamma = 'scale' , kernel = 'rbf')
+  model3.fit(tf.squeeze(train_data[:,g_features[:((i+1)*x)]]), train_labels)
+  accuracy = accuracy_score(test_labels , model3.predict(tf.squeeze(test_data[:,g_features[:((i+1)*x)]])))
+  score = accuracy - ((i+1) * x - x ) * 0.00075
+  print("{:.4f}".format(np.round(score , 4)) ,"    ", "{:.3f}".format(np.round(accuracy , 3)) ,"      ", (i+1)*x)
