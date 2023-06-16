@@ -67,8 +67,8 @@ for i in range(10):
 x = 25
 print("Score" , "    Accuracy","    Features" , "\n")
 for i in range(10):
-  model3 = SVC(C = 2.2, gamma = 'scale' , kernel = 'rbf')
-  model3.fit(tf.squeeze(train_data[:,g_features[:((i+1)*x)]]), train_labels)
-  accuracy = accuracy_score(test_labels , model3.predict(tf.squeeze(test_data[:,g_features[:((i+1)*x)]])))
-  score = accuracy - ((i+1) * x - x ) * 0.00075
-  print("{:.4f}".format(np.round(score , 4)) ,"    ", "{:.3f}".format(np.round(accuracy , 3)) ,"      ", (i+1)*x)
+    model3 = SVC(C = 2.2, gamma = 'scale' , kernel = 'rbf')
+    model3.fit(tf.squeeze(train_data[:,g_features[:((i+1)*x)]]), train_labels)
+    accuracy = accuracy_score(test_labels , model3.predict(tf.squeeze(test_data[:,g_features[:((i+1)*x)]])))
+    score = accuracy - ((i+1) * x - x ) * 0.00075
+    print("{:.4f}".format(np.round(score , 4)) ,"    ", "{:.3f}".format(np.round(accuracy , 3)) ,"      ", (i+1)*x)
