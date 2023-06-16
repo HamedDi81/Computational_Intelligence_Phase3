@@ -5,6 +5,8 @@ from typing import Tuple
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+
 
 # Load the data and label
 def load_data(filename: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -68,9 +70,22 @@ x = 25
 results = list()
 print("Score" , "    Accuracy","    Features" , "\n")
 for i in range(10):
-  model3 = SVC(C = 2.2, gamma = 'scale' , kernel = 'rbf')
-  model3.fit(tf.squeeze(train_data[:,g_features[:((i+1)*x)]]), train_labels)
-  accuracy = accuracy_score(test_labels , model3.predict(tf.squeeze(test_data[:,g_features[:((i+1)*x)]])))
-  score = accuracy - ((i+1) * x - x ) * 0.00075
-  print("{:.4f}".format(np.round(score , 4)) ,"    ", "{:.3f}".format(np.round(accuracy , 3)) ,"      ", (i+1)*x)
-  results.append(((i+1)*x,np.round(score , 4) , np.round(accuracy , 3)))
+    model3 = SVC(C = 2.2, gamma = 'scale' , kernel = 'rbf')
+    model3.fit(tf.squeeze(train_data[:,g_features[:((i+1)*x)]]), train_labels)
+    accuracy = accuracy_score(test_labels , model3.predict(tf.squeeze(test_data[:,g_features[:((i+1)*x)]])))
+    score = accuracy - ((i+1) * x - x ) * 0.00075
+    print("{:.4f}".format(np.round(score , 4)) ,"    ", "{:.3f}".format(np.round(accuracy , 3)) ,"      ", (i+1)*x)
+    results.append(((i+1)*x,np.round(score , 4) , np.round(accuracy , 3)))
+
+#Visualization our work
+
+fig , ax = plt.subplots(figsize = [15,15])
+results2 = np.array(results)
+x = np.arange(len(results))
+ax.plot(x , results2[:,1])
+ax.plot(x , results2[:,2])
+plt.title("Results(texts are the number of the features on each set)")
+for i,num in enumerate(results2[:,0]):
+    ax.annotate(num , [x[i] , results2[:,1][i]] ,c = 'red')
+    ax.annotate(num , [x[i] , results2[:,2][i]] , c = 'purple')
+ax.legend(["Score" , "Accuracy"])
